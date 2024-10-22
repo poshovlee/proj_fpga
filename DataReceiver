@@ -1,0 +1,29 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity DataReceiver is
+    Port ( clk       : in  std_logic;
+           reset       : in  std_logic;
+           data_in   : in  std_logic_vector(9 downto 0); -- Données de 10 bits
+           new_data   : in  std_logic; -- Signal indiquant que de nouvelles données sont disponibles
+           stored_data : out std_logic_vector(9 downto 0)  -- Données stockées à afficher
+         );
+end DataReceiver;
+
+architecture Behavioral of DataReceiver is
+    signal data_buffer : std_logic_vector(9 downto 0);
+begin
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            data_buffer <= (others => '0');
+        elsif rising_edge(clk) then
+            if new_data = '1' then
+                data_buffer <= data_in;  -- Stocke les nouvelles données
+            end if;
+        end if;
+    end process;
+
+    stored_data <= data_buffer;  -- Sortie des données stockées
+end Behavioral;
