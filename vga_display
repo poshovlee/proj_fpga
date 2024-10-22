@@ -1,0 +1,58 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity vga_display is
+    port(
+        hpos       : in  std_logic_vector(9 downto 0);  -- Position horizontale du pixel
+        vpos       : in  std_logic_vector(9 downto 0);  -- Position verticale du pixel
+        video_on   : in  std_logic;
+        grid_scale : in integer;                       -- Espacement de la grille
+        stored_data : in std_logic_vector(9 downto 0);  -- Données à afficher (nouveau port)
+        pixel_on   : out std_logic;                      -- Signal de pixel actif
+        reset      : in std_logic                       -- Port de réinitialisation ajouté
+    );
+end vga_display;
+
+architecture Behavioral of vga_display is
+    constant POINT_SPACING : integer := 1;              -- Espacement de 1 pixel entre chaque point
+
+    -- Tableau contenant 640 ordonnées (chaque valeur sur 10 bits)
+    type y_values_array is array (0 to 639) of std_logic_vector(9 downto 0);
+    signal y_values : y_values_array;  -- Déclarez le signal sans initialisation
+
+begin
+    -- Processus d'initialisation de y_values
+    process(reset)
+    begin
+        if reset = '1' then
+            for i in 0 to 639 loop
+                y_values(i) <= (others => '0');  -- Initialisation des valeurs à 0
+            end loop;
+        end if;
+    end process;
+
+    process(hpos, vpos, video_on, grid_scale, stored_data)
+        variable x_index : integer;                -- Index horizontal pour les points
+    begin
+        if video_on = '1' then
+            -- Gestion de l'affichage des points
+            x_index := to_integer(unsigned(hpos)) / POINT_SPACING;
+
+            -- S'assurer que l'index est dans la plage (0 à 639)
+            if (x_index < 640) then
+                -- Vérifiez si vpos correspond à la valeur reçue
+                if vpos = stored_data then  -- Comparaison avec la valeur reçue
+                    pixel_on <= '1';  -- Active le pixel (affiche un point)
+                else
+                    pixel_on <= '0';  -- Désactive sinon
+                end if;
+            else
+                pixel_on <= '0';  -- Hors limites du tableau
+            end if;
+        else
+            pixel_on <= '0';  -- Hors zone vidéo
+        end if;
+    end process;
+end Behavioral;
+
