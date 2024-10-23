@@ -1,0 +1,25 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+-- Déclaration de l'entité
+entity ard_de10 is
+    Port (
+        clk         : in  std_logic;              -- Horloge
+        arduino_pins : in  std_logic_vector(9 downto 0);  -- Entrée des bits de l'Arduino (D2 à D11)
+        data_out    : out std_logic_vector(9 downto 0)    -- Sortie : les données lues des broches Arduino
+    );
+end ard_de10;
+
+-- Architecture
+architecture Behavioral of ard_de10 is
+begin
+    -- Processus déclenché par le signal d'horloge
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            data_out <= arduino_pins;  -- Capture les 10 bits venant de l'Arduino
+        end if;
+    end process;
+end Behavioral;
