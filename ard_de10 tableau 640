@@ -1,0 +1,42 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+-- Déclaration de l'entité
+entity ard_de10 is
+    Port (
+        clk          : in  std_logic;                      -- Horloge
+        arduino_pins : in  std_logic_vector(9 downto 0);  -- Entrée des bits de l'Arduino (D2 à D11)
+        reset_button : in  std_logic;                      -- Bouton poussoir pour réinitialiser
+        data_out     : out std_logic_vector(9 downto 0)    -- Sortie : les données lues des broches Arduino
+    );
+end ard_de10;
+
+-- Architecture
+architecture Behavioral of ard_de10 is
+    type data_array is array (0 to 639) of std_logic_vector(9 downto 0); -- Déclaration d'un tableau de 640 valeurs
+    signal data_storage : data_array;                             -- Signal pour stocker les données
+    signal count        : integer := 0;                           -- Compteur de valeurs reçues
+    signal receiving    : boolean := false;                        -- Indicateur de réception
+begin
+    -- Processus déclenché par le signal d'horloge
+    process (clk, reset_button)
+    begin
+        if reset_button = '1' then
+            count <= 0;                       -- Réinitialiser le compteur
+            receiving <= true;                -- Démarrer la réception
+            data_out <= (others => '0');     -- Réinitialiser la sortie
+        elsif rising_edge(clk) then
+            if receiving then
+                data_storage(count) <= arduino_pins;  -- Stocker les 10 bits dans le tableau
+                data_out <= arduino_pins;              -- Sortie des 10 bits venant de l'Arduino
+                count <= count + 1;                    -- Incrémenter le compteur
+
+                if count = 639 then
+                    receiving <= false;                 -- Arrêter la réception après 640 valeurs
+                end if;
+            end if;
+        end if;
+    end process;
+end Behavioral;
