@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;  -- Utilisation de NUMERIC_STD pour to_integer et unsigned
 
-entity vga_ard is
+entity VGAA is
     port(
         clk       : in  std_logic;
         reset     : in  std_logic;
@@ -16,9 +16,9 @@ entity vga_ard is
         new_data  : in  std_logic;                      -- Indique quand de nouvelles données arrivent
         stored_data : out std_logic_vector(9 downto 0)  -- Données stockées à afficher
     );
-end vga_ard;
+end VGAA;
 
-architecture Behavioral of vga_ard is
+architecture Behavioral of VGAA is
     signal hpos     : std_logic_vector(9 downto 0);
     signal vpos     : std_logic_vector(9 downto 0);
     signal video_on : std_logic;
